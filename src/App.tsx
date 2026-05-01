@@ -125,11 +125,49 @@ function LoadingScreen({ onFinish }: { onFinish: () => void }) {
 // --- Main App Component ---
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [brawlerColor, setBrawlerColor] = useState('#FFCE00');
+  const [message, setMessage] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const colors = ['#FFCE00', '#FF3B30', '#00FF90', '#FF8F00', '#BF5AF2', '#32D74B'];
+
+  const cycleColor = () => {
+    const nextIndex = (colors.indexOf(brawlerColor) + 1) % colors.length;
+    setBrawlerColor(colors[nextIndex]);
+    showNotification('SKIN CHANGED!');
+  };
+
+  const showNotification = (msg: string) => {
+    setMessage(msg);
+    setTimeout(() => setMessage(null), 2000);
+  };
+
+  const handlePlay = () => {
+    setIsSearching(true);
+    showNotification('SEARCHING PLAYERS...');
+    setTimeout(() => {
+      setIsSearching(false);
+      showNotification('SERVER FULL! TRY LATER');
+    }, 3000);
+  };
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#0F1123] font-sans text-white">
       <AnimatePresence>
         {loading && <LoadingScreen onFinish={() => setLoading(false)} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {message && (
+          <motion.div 
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 20, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            className="absolute top-20 left-1/2 -translate-x-1/2 z-[100] bg-red-600 border-4 border-black px-8 py-3 rounded-xl brawl-text text-2xl shadow-[4px_4px_0px_black]"
+          >
+            {message}
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Main Menu UI */}
@@ -156,37 +194,44 @@ export default function App() {
             <div className="flex h-10 items-center bg-black/60 rounded-lg px-4 border-2 border-[#00FF90] font-display text-lg min-w-[100px]">
               <span className="mr-2">💎</span> 84
             </div>
-            <div className="flex h-10 items-center bg-black/60 rounded-lg px-4 border-2 border-[#333] font-display text-lg">
-              <Star className="w-4 h-4 text-purple-400 mr-2" /> 2,100
-            </div>
           </div>
         </header>
 
         {/* Sidebar */}
         <div className="absolute left-6 top-32 flex flex-col gap-6 pointer-events-auto">
-          <button className="gaming-card w-28 h-28 flex flex-col justify-center items-center -rotate-2">
+          <button 
+            onClick={() => showNotification('SHOP IS CLOSED')}
+            className="gaming-card w-28 h-28 flex flex-col justify-center items-center -rotate-2"
+          >
             <div className="text-4xl mb-1">🛒</div>
             <span className="text-[10px] uppercase font-bold tracking-[2px] opacity-80">Shop</span>
           </button>
-          <button className="gaming-card w-28 h-28 flex flex-col justify-center items-center rotate-2">
+          <button 
+            onClick={cycleColor}
+            className="gaming-card w-28 h-28 flex flex-col justify-center items-center rotate-2 bg-[#4B0082]"
+          >
             <div className="text-4xl mb-1">🥊</div>
             <span className="text-[10px] uppercase font-bold tracking-[2px] opacity-80">Brawlers</span>
           </button>
-          <button className="gaming-card w-28 h-28 flex flex-col justify-center items-center -rotate-1">
+          <button 
+            onClick={() => showNotification('NEW TROPHY REACHED!')}
+            className="gaming-card w-28 h-28 flex flex-col justify-center items-center -rotate-1"
+          >
             <div className="text-4xl mb-1">🏆</div>
             <span className="text-[10px] uppercase font-bold tracking-[2px] opacity-80">Trophies</span>
           </button>
         </div>
 
-        {/* Character Info (Floating above pedestal) */}
+        {/* Character Info */}
         <div className="flex-1 flex flex-col items-center justify-end pb-48 pointer-events-none">
           <motion.div 
+            key={brawlerColor}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center z-20"
           >
             <div className="bg-[#FFD200] text-black px-4 py-0.5 rounded font-bold text-xs inline-block mb-2">RANK 25</div>
-            <h1 className="brawl-text text-7xl uppercase tracking-widest italic">TANK-BOT</h1>
+            <h1 className="brawl-text text-7xl uppercase tracking-widest italic" style={{ color: brawlerColor }}>TANK-BOT</h1>
           </motion.div>
         </div>
 
@@ -200,10 +245,12 @@ export default function App() {
 
           {/* Play Button */}
           <button 
-            className="play-btn w-64 h-28 rounded-[25px] flex items-center justify-center -rotate-1"
-            onClick={() => console.log('Play button is non-functional')}
+            className={`play-btn w-64 h-28 rounded-[25px] flex items-center justify-center -rotate-1 ${isSearching ? 'grayscale pointer-events-none' : ''}`}
+            onClick={handlePlay}
           >
-            <span className="brawl-text text-5xl italic text-black uppercase tracking-tighter shadow-none">PLAY</span>
+            <span className="brawl-text text-5xl italic text-black uppercase tracking-tighter">
+              {isSearching ? '...' : 'PLAY'}
+            </span>
           </button>
         </footer>
       </div>
@@ -216,29 +263,63 @@ export default function App() {
         ></div>
         
         {/* Stage Pedestal Shadow */}
-        <div className="absolute bottom-[100px] left-1/2 -translate-x-1/2 w-[400px] h-[60px] bg-black/40 rounded-[50%] blur-xl"></div>
+        <div className="absolute bottom-[100px] left-1/2 -translate-x-1/2 w-[400px] h-[60px] bg-black/40 rounded-[50%] blur-xl opacity-60"></div>
 
         <Canvas shadows gl={{ antialias: true }}>
           <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
-          <ambientLight intensity={1.2} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
-          <pointLight position={[-10, -10, -10]} intensity={0.5} />
+          <ambientLight intensity={1} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} />
+          <pointLight position={[-10, 10, -10]} intensity={0.5} />
           
           <Suspense fallback={null}>
-            <BrawlerModel />
+            <Float speed={2} rotationIntensity={1} floatIntensity={1}>
+              <group rotation={[0, Math.PI / 4, 0]}>
+                <mesh>
+                  <sphereGeometry args={[1.5, 64, 64]} />
+                  <MeshDistortMaterial
+                    color={brawlerColor}
+                    speed={3}
+                    distort={0.1}
+                    radius={1}
+                    metalness={0.2}
+                    roughness={0.6}
+                  />
+                </mesh>
+                
+                <group position={[0, 0, 0.4]}>
+                  <mesh position={[0.5, 0.4, 1.1]}>
+                    <sphereGeometry args={[0.2, 16, 16]} />
+                    <meshBasicMaterial color="black" />
+                  </mesh>
+                  <mesh position={[-0.5, 0.4, 1.1]}>
+                    <sphereGeometry args={[0.2, 16, 16]} />
+                    <meshBasicMaterial color="black" />
+                  </mesh>
+                  <mesh position={[0, 0, 1.2]} rotation={[0.4, 0, 0]}>
+                    <torusGeometry args={[0.3, 0.05, 16, 32, Math.PI]} />
+                    <meshBasicMaterial color="black" />
+                  </mesh>
+                </group>
+
+                <mesh position={[0, -1.8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                  <circleGeometry args={[1.8, 32]} />
+                  <meshBasicMaterial color="black" transparent opacity={0.3} />
+                </mesh>
+              </group>
+            </Float>
           </Suspense>
 
           <OrbitControls 
             enablePan={false} 
             enableZoom={false} 
-            minPolarAngle={Math.PI / 2.5} 
+            minPolarAngle={Math.PI / 3} 
             maxPolarAngle={Math.PI / 1.5}
           />
         </Canvas>
       </div>
 
       {/* Vignette */}
-      <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_200px_rgba(0,0,0,0.7)]"></div>
+      <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_200px_rgba(0,0,0,0.8)]"></div>
     </div>
   );
 }

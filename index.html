@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brawl Stars - Награда</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-blue: #3262fb;
+            --btn-yellow: #fec111;
+            --btn-yellow-light: #ffe652;
+            --btn-yellow-dark: #cc8200;
+            --text-stroke: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Lilita One', cursive;
+            background-color: var(--bg-blue);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Едва заметный паттерн на фоне */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("https://cdn.brawlify.com/images/bg-stars.png");
+            background-size: 150px;
+            opacity: 0.08;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Шапка с выбором языка */
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .lang-btn {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 13px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Основной контент */
+        .main-content {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 20px 40px 20px;
+        }
+
+        /* Логотип */
+        .logo {
+            width: 280px;
+            height: auto;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 8px 0 rgba(0,0,0,0.15));
+        }
+
+        /* Заголовок (точная копия обводки и теней) */
+        .title {
+            font-size: 26px;
+            text-align: center;
+            line-height: 1.15;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+            /* Многослойная тень для создания толстой черной обводки и 3D тени вниз */
+            text-shadow: 
+                -2px -2px 0 var(--text-stroke),  
+                 2px -2px 0 var(--text-stroke),
+                -2px  2px 0 var(--text-stroke),
+                 2px  2px 0 var(--text-stroke),
+                 0px  2px 0 var(--text-stroke),
+                 0px  3px 0 var(--text-stroke),
+                 0px  4px 0 var(--text-stroke),
+                 0px  5px 0 var(--text-stroke);
+        }
+
+        /* ИДЕАЛЬНАЯ КНОПКА */
+        .claim-button {
+            width: 95%;
+            background-color: var(--btn-yellow);
+            border: 3px solid var(--text-stroke);
+            border-radius: 6px;
+            padding: 16px 10px;
+            font-family: 'Lilita One', cursive;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 50px;
+            
+            /* Фирменный наклон */
+            transform: skewX(-4deg);
+            
+            /* Сложная тень: внутренний блик сверху, внутреннее затемнение снизу, черная 3D тень снаружи */
+            box-shadow: 
+                inset 0 4px 0 var(--btn-yellow-light), 
+                inset 0 -6px 0 var(--btn-yellow-dark), 
+                0 6px 0 var(--text-stroke);
+                
+            transition: transform 0.05s, box-shadow 0.05s;
+            
+            /* Обводка текста внутри кнопки */
+            text-shadow: 
+                -2px -2px 0 var(--text-stroke),  
+                 2px -2px 0 var(--text-stroke),
+                -2px  2px 0 var(--text-stroke),
+                 2px  2px 0 var(--text-stroke),
+                 0px  3px 0 var(--text-stroke);
+        }
+
+        /* Выравниваем текст обратно (убираем наклон для текста) */
+        .claim-button span {
+            display: block;
+            transform: skewX(4deg);
+            letter-spacing: 0.5px;
+        }
+
+        .claim-button:active {
+            transform: skewX(-4deg) translateY(4px);
+            box-shadow: 
+                inset 0 2px 0 var(--btn-yellow-light), 
+                inset 0 -3px 0 var(--btn-yellow-dark), 
+                0 2px 0 var(--text-stroke);
+        }
+
+        /* Текст над Google Play */
+        .download-label {
+            font-size: 22px;
+            margin-bottom: 15px;
+            word-spacing: 2px;
+            text-shadow: 
+                -2px -2px 0 var(--text-stroke),  
+                 2px -2px 0 var(--text-stroke),
+                -2px  2px 0 var(--text-stroke),
+                 2px  2px 0 var(--text-stroke),
+                 0px  3px 0 var(--text-stroke),
+                 0px  4px 0 var(--text-stroke);
+        }
+
+        /* Кнопка Google Play */
+        .gp-link {
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+
+        .gp-link:active {
+            transform: scale(0.95);
+        }
+
+        .gp-link img {
+            height: 60px; /* Фиксированная высота для точности как на фото */
+            width: auto;
+        }
+
+        /* Подвал */
+        .footer {
+            background: #000000;
+            width: 100%;
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-item {
+            color: #ffffff;
+            text-decoration: none;
+            font-family: sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .footer-item:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="lang-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            русский
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <img src="https://i.ibb.co/Y49k6Mgh/output.webp" alt="Brawl Stars Logo" class="logo">
+
+        <div class="title">
+            Получите награду в Brawl<br>Stars!
+        </div>
+
+        <button class="claim-button">
+            <span>Получить награду</span>
+        </button>
+
+        <div class="download-label">Скачать Brawl Stars</div>
+        
+        <a href="https://play.google.com/store/apps/details?id=com.supercell.brawlstars" class="gp-link" target="_blank">
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/ru_badge_web_generic.png" alt="СКАЧАТЬ ИЗ Google Play">
+        </a>
+    </div>
+
+    <div class="footer">
+        <a href="#" class="footer-item">Справочник<br>для</a>
+        <a href="#" class="footer-item">Условия<br>пользования</a>
+        <a href="#" class="footer-item">Политика<br>конфиденциальности</a>
+    </div>
+
+</body>
+</html>
